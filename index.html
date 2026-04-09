@@ -2,828 +2,455 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1a3a1f">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>Invernadero M.10 — Fichaje</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Invernadero M.10 · Tomate Cherry</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap');
 
-:root {
-  --green-deep:  #1a3a1f;
-  --green-dark:  #2d5a34;
-  --green-mid:   #3d7a45;
-  --green-fresh: #5aaa64;
-  --green-light: #a8d5ad;
-  --green-pale:  #e4f4e6;
-  --cream:       #faf8f2;
-  --cream-dark:  #f0ebe0;
-  --gold:        #c8a84b;
-  --gold-light:  #e8cc7a;
-  --text-dark:   #1a2e1b;
-  --text-mid:    #3d5e40;
-  --text-dim:    #7a9e7e;
-  --white:       #ffffff;
-  --shadow-green: 0 4px 24px rgba(26,58,31,0.18);
-  --shadow-lg:    0 8px 40px rgba(26,58,31,0.22);
-  --radius:       18px;
-}
+  :root {
+    --verde: #2d6a2d;
+    --verde-claro: #4caf50;
+    --verde-neon: #7ec850;
+    --amarillo: #f5c842;
+    --rojo: #e53935;
+    --blanco: #f9fbf7;
+    --gris: #1a1f1a;
+    --card-bg: rgba(255,255,255,0.06);
+  }
 
-* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-html, body {
-  width:100%; height:100%; overflow:hidden;
-  background: var(--green-deep);
-  font-family: 'DM Sans', sans-serif;
-  color: var(--text-dark);
-}
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gris);
+    color: var(--blanco);
+    min-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* ═══════════════════════════════════════
-   SCREENS
-═══════════════════════════════════════ */
-.screen {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.4s ease;
-  overflow-y: auto;
-}
-.screen.active { opacity:1; pointer-events:all; }
+  /* ── PANTALLA CAMARA ── */
+  #screen-camera {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    background: #000;
+  }
 
-/* ═══════════════════════════════════════
-   SCREEN 1 — CAMERA / SCANNER
-═══════════════════════════════════════ */
-#screenCamera {
-  background: #000;
-  align-items: center;
-  justify-content: center;
-}
+  #header-cam {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    padding: 20px 20px 12px;
+    background: linear-gradient(to bottom, rgba(0,0,0,.75) 0%, transparent 100%);
+    text-align: center;
+  }
+  #header-cam h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 3px;
+    color: var(--verde-neon);
+    line-height: 1;
+  }
+  #header-cam p {
+    font-size: .75rem;
+    color: rgba(255,255,255,.6);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
 
-.camera-wrapper {
-  position: relative;
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column;
-}
+  #video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
 
-#videoEl {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-}
+  #overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qr-frame {
+    width: 220px; height: 220px;
+    position: relative;
+  }
+  .qr-frame::before, .qr-frame::after,
+  .qr-frame span::before, .qr-frame span::after {
+    content: '';
+    position: absolute;
+    width: 36px; height: 36px;
+    border-color: var(--verde-neon);
+    border-style: solid;
+  }
+  .qr-frame::before  { top: 0;    left: 0;  border-width: 3px 0 0 3px; }
+  .qr-frame::after   { top: 0;    right: 0; border-width: 3px 3px 0 0; }
+  .qr-frame span::before { bottom: 0; left: 0;  border-width: 0 0 3px 3px; }
+  .qr-frame span::after  { bottom: 0; right: 0; border-width: 0 3px 3px 0; }
 
-/* top bar */
-.cam-topbar {
-  position: absolute; top: 0; left: 0; right: 0;
-  padding: 48px 24px 20px;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.75), transparent);
-  z-index: 10; text-align: center;
-}
-.cam-topbar .logo {
-  font-family: 'Fraunces', serif;
-  font-size: 13px; font-weight: 700;
-  color: rgba(255,255,255,0.5);
-  letter-spacing: 4px; text-transform: uppercase;
-  margin-bottom: 4px;
-}
-.cam-topbar h1 {
-  font-family: 'Fraunces', serif;
-  font-size: 22px; font-weight: 900;
-  color: #fff; letter-spacing: 0.5px;
-}
-.cam-topbar .subtitle {
-  font-size: 12px; color: rgba(255,255,255,0.55);
-  margin-top: 3px; letter-spacing: 1px;
-}
+  .scan-line {
+    position: absolute; top: 0; left: 4px; right: 4px; height: 2px;
+    background: linear-gradient(to right, transparent, var(--verde-neon), transparent);
+    animation: scan 2s linear infinite;
+    box-shadow: 0 0 8px var(--verde-neon);
+  }
+  @keyframes scan { 0%{top:0} 100%{top:100%} }
 
-/* scanner overlay */
-.scanner-overlay {
-  position: absolute; inset: 0;
-  z-index: 5; pointer-events: none;
-}
-.scanner-frame {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -55%);
-  width: 220px; height: 220px;
-}
-.corner {
-  position: absolute;
-  width: 36px; height: 36px;
-  border-color: var(--gold-light);
-  border-style: solid;
-  border-width: 0;
-}
-.corner.tl { top:0; left:0;  border-top-width:3px; border-left-width:3px;  border-radius:6px 0 0 0; }
-.corner.tr { top:0; right:0; border-top-width:3px; border-right-width:3px; border-radius:0 6px 0 0; }
-.corner.bl { bottom:0; left:0;  border-bottom-width:3px; border-left-width:3px;  border-radius:0 0 0 6px; }
-.corner.br { bottom:0; right:0; border-bottom-width:3px; border-right-width:3px; border-radius:0 0 6px 0; }
+  #cam-hint {
+    position: absolute; bottom: 50px; left: 0; right: 0;
+    text-align: center;
+    font-size: .8rem;
+    color: rgba(255,255,255,.55);
+    letter-spacing: 1px;
+  }
 
-.scan-line {
-  position: absolute;
-  top: 0; left: 6px; right: 6px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
-  box-shadow: 0 0 8px var(--gold);
-  animation: scan-sweep 2s ease-in-out infinite;
-}
-@keyframes scan-sweep {
-  0%   { top: 6px;   opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 1; }
-  100% { top: 214px; opacity: 0; }
-}
+  /* ── PANTALLA BIENVENIDA ── */
+  #screen-welcome {
+    display: none;
+    position: fixed; inset: 0;
+    flex-direction: column;
+    background: linear-gradient(160deg, #0d1f0d 0%, #1a2e14 50%, #0f1a0f 100%);
+    overflow-y: auto;
+    padding-bottom: 30px;
+  }
+  #screen-welcome.active { display: flex; }
 
-.scan-hint {
-  position: absolute;
-  bottom: 80px; left: 0; right: 0;
-  text-align: center;
-  font-size: 13px; color: rgba(255,255,255,0.7);
-  letter-spacing: 0.5px;
-}
-.scan-hint span {
-  background: rgba(0,0,0,0.45);
-  padding: 7px 18px; border-radius: 20px;
-  backdrop-filter: blur(4px);
-}
+  .welcome-top {
+    padding: 36px 24px 20px;
+    text-align: center;
+    position: relative;
+  }
+  .welcome-top::after {
+    content: '';
+    display: block;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--verde-neon), transparent);
+    margin-top: 20px;
+  }
 
-/* bottom bar camera */
-.cam-bottombar {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 20px 24px 44px;
-  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-  z-index: 10;
-  display: flex; align-items: center; justify-content: center; gap: 16px;
-}
-.cam-status {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px; color: rgba(255,255,255,0.6);
-  letter-spacing: 1px; text-align: center;
-}
-.cam-status.error { color: #ff6b6b; }
+  .badge {
+    display: inline-block;
+    background: rgba(126,200,80,.12);
+    border: 1px solid rgba(126,200,80,.3);
+    border-radius: 40px;
+    padding: 4px 14px;
+    font-size: .68rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--verde-neon);
+    margin-bottom: 14px;
+  }
 
-/* canvas hidden */
-#canvasEl { display:none; }
+  .welcome-top h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    line-height: 1.05;
+    letter-spacing: 2px;
+  }
+  .welcome-top h2 span { color: var(--verde-neon); }
 
-/* ═══════════════════════════════════════
-   SCREEN 2 — WELCOME
-═══════════════════════════════════════ */
-#screenWelcome {
-  background: var(--cream);
-  min-height: 100vh;
-  padding: 0;
-  overflow-y: auto;
-}
+  .welcome-top .subtitulo {
+    font-size: .85rem;
+    color: rgba(255,255,255,.55);
+    margin-top: 6px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
 
-.welcome-hero {
-  background: linear-gradient(160deg, var(--green-deep) 0%, var(--green-dark) 60%, var(--green-mid) 100%);
-  padding: 52px 28px 40px;
-  position: relative;
-  overflow: hidden;
-}
-.welcome-hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image:
-    radial-gradient(circle at 85% 20%, rgba(200,168,75,0.12), transparent 50%),
-    radial-gradient(circle at 10% 80%, rgba(90,170,100,0.15), transparent 40%);
-}
-.welcome-hero::after {
-  content: '🌿';
-  position: absolute;
-  right: -10px; bottom: -20px;
-  font-size: 140px;
-  opacity: 0.07;
-  transform: rotate(-20deg);
-  line-height: 1;
-}
+  .question-row {
+    margin: 0 24px;
+    padding: 16px 20px;
+    background: rgba(126,200,80,.07);
+    border-left: 3px solid var(--verde-neon);
+    border-radius: 0 10px 10px 0;
+  }
+  .question-row p {
+    font-size: .72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--verde-neon);
+    margin-bottom: 2px;
+  }
+  .question-row h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: var(--blanco);
+  }
 
-.hero-tag {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 10px; font-weight: 700;
-  color: var(--gold-light);
-  letter-spacing: 4px; text-transform: uppercase;
-  margin-bottom: 16px;
-  display: flex; align-items: center; gap: 8px;
-}
-.hero-tag::before {
-  content:''; width:24px; height:1px; background:var(--gold);
-}
+  .btn-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 16px 24px 0;
+  }
 
-.hello-text {
-  font-family: 'Fraunces', serif;
-  font-size: 15px; font-weight: 400; font-style: italic;
-  color: var(--green-light);
-  margin-bottom: 4px;
-  position: relative; z-index: 1;
-}
-.employee-name {
-  font-family: 'Fraunces', serif;
-  font-size: 42px; font-weight: 900;
-  color: #fff; line-height: 1;
-  margin-bottom: 12px;
-  position: relative; z-index: 1;
-  animation: slidein 0.5s cubic-bezier(0.16,1,0.3,1) both;
-}
-@keyframes slidein {
-  from { opacity:0; transform: translateY(16px); }
-  to   { opacity:1; transform: translateY(0); }
-}
+  .btn-task {
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 14px;
+    padding: 18px 12px;
+    text-align: center;
+    color: var(--blanco);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .18s ease;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 8px;
+    min-height: 90px;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-task::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(126,200,80,.15), transparent);
+    opacity: 0;
+    transition: opacity .18s;
+  }
+  .btn-task:active::before { opacity: 1; }
+  .btn-task:active { transform: scale(.96); border-color: var(--verde-neon); }
 
-.welcome-badge {
-  display: inline-block;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.2);
-  backdrop-filter: blur(8px);
-  border-radius: 50px;
-  padding: 8px 18px;
-  font-size: 13px; font-weight: 500;
-  color: rgba(255,255,255,0.9);
-  letter-spacing: 0.3px;
-  position: relative; z-index: 1;
-}
+  .btn-task .icon { font-size: 1.6rem; }
 
-/* greenhouse info strip */
-.gh-strip {
-  background: var(--gold);
-  padding: 12px 28px;
-  display: flex; align-items: center; gap: 12px;
-}
-.gh-strip .icon { font-size: 22px; flex-shrink: 0; }
-.gh-strip-text {}
-.gh-strip-label {
-  font-size: 9px; font-weight: 700;
-  color: var(--green-deep); letter-spacing: 3px;
-  text-transform: uppercase; opacity: 0.7;
-}
-.gh-strip-name {
-  font-family: 'Fraunces', serif;
-  font-size: 17px; font-weight: 900;
-  color: var(--green-deep); line-height: 1.1;
-}
+  .btn-finish {
+    grid-column: span 2;
+    background: linear-gradient(135deg, var(--rojo) 0%, #b71c1c 100%);
+    border: none;
+    border-radius: 14px;
+    padding: 20px;
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: transform .18s, box-shadow .18s;
+    box-shadow: 0 4px 20px rgba(229,57,53,.4);
+  }
+  .btn-finish:active { transform: scale(.97); }
 
-/* question */
-.question-block {
-  padding: 24px 28px 12px;
-}
-.question-text {
-  font-family: 'Fraunces', serif;
-  font-size: 22px; font-weight: 700;
-  color: var(--text-dark);
-  line-height: 1.3; margin-bottom: 4px;
-}
-.question-sub {
-  font-size: 13px; color: var(--text-dim);
-}
+  /* ── FLASH ── */
+  #flash {
+    position: fixed; inset: 0; background: #fff;
+    opacity: 0; pointer-events: none;
+    transition: opacity .1s;
+    z-index: 100;
+  }
+  #flash.pop { opacity: .7; }
 
-/* task buttons */
-.tasks-grid {
-  padding: 8px 20px 20px;
-  display: flex; flex-direction: column; gap: 10px;
-}
-
-.task-btn {
-  width: 100%;
-  display: flex; align-items: center; gap: 16px;
-  padding: 16px 20px;
-  border-radius: var(--radius);
-  border: 1.5px solid transparent;
-  background: var(--white);
-  cursor: pointer;
-  transition: all 0.18s;
-  box-shadow: 0 2px 10px rgba(26,58,31,0.07);
-  text-align: left;
-  font-family: 'DM Sans', sans-serif;
-}
-.task-btn:active { transform: scale(0.97); }
-
-.task-icon {
-  width: 46px; height: 46px; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-  transition: transform 0.18s;
-}
-.task-btn:active .task-icon { transform: scale(1.1); }
-
-.task-label {
-  font-size: 15px; font-weight: 700;
-  color: var(--text-dark); line-height: 1.2;
-}
-.task-sub {
-  font-size: 11px; color: var(--text-dim);
-  margin-top: 1px;
-}
-.task-arrow {
-  margin-left: auto; font-size: 18px;
-  color: var(--text-dim); flex-shrink: 0;
-  transition: transform 0.18s;
-}
-.task-btn:active .task-arrow { transform: translateX(3px); }
-
-/* task themes */
-.task-btn.t1 { border-color: rgba(61,122,69,0.2); }
-.task-btn.t1 .task-icon { background: #e8f5e9; }
-.task-btn.t1:active { background: #f1fbf2; border-color: var(--green-mid); }
-
-.task-btn.t2 { border-color: rgba(255,179,0,0.2); }
-.task-btn.t2 .task-icon { background: #fff8e1; }
-.task-btn.t2:active { background: #fffde7; border-color: #ffb300; }
-
-.task-btn.t3 { border-color: rgba(33,150,243,0.2); }
-.task-btn.t3 .task-icon { background: #e3f2fd; }
-.task-btn.t3:active { background: #e3f2fd; border-color: #2196f3; }
-
-.task-btn.t4 { border-color: rgba(0,188,212,0.2); }
-.task-btn.t4 .task-icon { background: #e0f7fa; }
-.task-btn.t4:active { background: #e0f7fa; border-color: #00bcd4; }
-
-.task-btn.t5 { border-color: rgba(156,39,176,0.2); }
-.task-btn.t5 .task-icon { background: #f3e5f5; }
-.task-btn.t5:active { background: #f3e5f5; border-color: #9c27b0; }
-
-.task-btn.t6 { border-color: rgba(255,87,34,0.2); }
-.task-btn.t6 .task-icon { background: #fbe9e7; }
-.task-btn.t6:active { background: #fbe9e7; border-color: #ff5722; }
-
-/* FINISH button */
-.task-btn.finish {
-  background: var(--green-deep);
-  border-color: var(--green-deep);
-  margin-top: 4px;
-}
-.task-btn.finish .task-icon { background: rgba(255,255,255,0.12); }
-.task-btn.finish .task-label { color: #fff; font-size: 16px; }
-.task-btn.finish .task-sub { color: rgba(255,255,255,0.5); }
-.task-btn.finish .task-arrow { color: rgba(255,255,255,0.4); }
-.task-btn.finish:active { background: var(--green-dark); transform: scale(0.97); }
-
-/* bottom padding */
-.screen-pad-bottom { height: 32px; }
-
-/* ═══════════════════════════════════════
-   SCREEN 3 — TASK LOGGED
-═══════════════════════════════════════ */
-#screenDone {
-  background: var(--green-deep);
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px 32px;
-}
-
-.done-icon {
-  font-size: 72px; margin-bottom: 20px;
-  animation: pop 0.5s cubic-bezier(0.16,1,0.3,1) both;
-}
-@keyframes pop {
-  from { transform: scale(0.3); opacity:0; }
-  to   { transform: scale(1);   opacity:1; }
-}
-.done-name {
-  font-family: 'Fraunces', serif;
-  font-size: 28px; font-weight: 900;
-  color: #fff; margin-bottom: 6px;
-}
-.done-task {
-  font-family: 'Fraunces', serif;
-  font-size: 18px; font-style: italic;
-  color: var(--green-light); margin-bottom: 24px;
-}
-.done-time {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px; color: var(--text-dim);
-  margin-bottom: 40px;
-  background: rgba(255,255,255,0.06);
-  padding: 8px 20px; border-radius: 20px;
-  display: inline-block;
-}
-.done-next {
-  font-size: 13px; color: rgba(255,255,255,0.4);
-  animation: fadein 0.5s 1.2s both;
-}
-@keyframes fadein { from{opacity:0} to{opacity:1} }
-
-/* ═══════════════════════════════════════
-   LOG PANEL (small, bottom)
-═══════════════════════════════════════ */
-.log-panel {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(26,58,31,0.95);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid rgba(90,170,100,0.2);
-  padding: 8px 16px 24px;
-  max-height: 130px; overflow-y: auto;
-  z-index: 50;
-  font-family: 'DM Sans', monospace;
-  font-size: 11px;
-  display: none;
-}
-.log-panel.visible { display: block; }
-.log-entry { color: #7aaa7e; line-height: 1.8; }
-.log-entry.ok  { color: #a5d6a7; }
-.log-entry.err { color: #ef9a9a; }
-
-/* ═══════════════════════════════════════
-   UTILITY
-═══════════════════════════════════════ */
-.sr-only { position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0); }
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: rgba(30,50,20,.95);
+    border: 1px solid var(--verde-neon);
+    color: var(--blanco);
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: .82rem;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all .3s;
+    z-index: 200;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
-<!-- ══ SCREEN: CAMERA ══════════════════════════════ -->
-<div class="screen active" id="screenCamera">
-  <div class="camera-wrapper">
-    <video id="videoEl" autoplay muted playsinline></video>
-    <canvas id="canvasEl"></canvas>
+<!-- FLASH -->
+<div id="flash"></div>
+<!-- TOAST -->
+<div id="toast"></div>
 
-    <div class="cam-topbar">
-      <div class="logo">🌿 Invernadero M.10</div>
-      <h1>Tomate Cherry</h1>
-      <div class="subtitle">SISTEMA DE FICHAJE — MUESTRA TU QR</div>
+<!-- PANTALLA CÁMARA -->
+<div id="screen-camera">
+  <div id="header-cam">
+    <h1>INVERNADERO M.10</h1>
+    <p>Tomate Cherry · Control de Acceso</p>
+  </div>
+  <video id="video" playsinline autoplay muted></video>
+  <div id="overlay">
+    <div class="qr-frame"><span></span>
+      <div class="scan-line"></div>
     </div>
+  </div>
+  <div id="cam-hint">📷 Apunta el QR de tu tarjeta</div>
+</div>
 
-    <div class="scanner-overlay">
-      <div class="scanner-frame">
-        <div class="corner tl"></div>
-        <div class="corner tr"></div>
-        <div class="corner bl"></div>
-        <div class="corner br"></div>
-        <div class="scan-line"></div>
-      </div>
-    </div>
+<!-- PANTALLA BIENVENIDA -->
+<div id="screen-welcome">
+  <div class="welcome-top">
+    <div class="badge">🌿 Invernadero M.10</div>
+    <h2>¡HOLA, <span id="nombre-empleado">EMPLEADO</span>!</h2>
+    <p class="subtitulo">Bienvenido al Invernadero M.10<br>Tomate Cherry</p>
+  </div>
 
-    <div class="scan-hint"><span>Coloca tu QR dentro del marco</span></div>
+  <div class="question-row">
+    <p>Registro de actividad</p>
+    <h3>¿QUÉ VAS A HACER HOY?</h3>
+  </div>
 
-    <div class="cam-bottombar">
-      <div class="cam-status" id="camStatus">Iniciando cámara selfie...</div>
-    </div>
+  <div class="btn-grid">
+    <button class="btn-task" onclick="registrar('Manejo de Cultivo')">
+      <span class="icon">🌱</span>Manejo de Cultivo
+    </button>
+    <button class="btn-task" onclick="registrar('Polinizaciones')">
+      <span class="icon">🐝</span>Polinizaciones
+    </button>
+    <button class="btn-task" onclick="registrar('Preparación Invernadero')">
+      <span class="icon">🏗️</span>Preparación Invernadero
+    </button>
+    <button class="btn-task" onclick="registrar('Limpieza de Invernadero')">
+      <span class="icon">🧹</span>Limpieza de Invernadero
+    </button>
+    <button class="btn-task" onclick="registrar('Muestras')">
+      <span class="icon">🔬</span>Muestras
+    </button>
+    <button class="btn-task" onclick="registrar('Scouting')">
+      <span class="icon">🔍</span>Scouting
+    </button>
+    <button class="btn-finish" onclick="terminar()">
+      ✅ &nbsp;HE TERMINADO
+    </button>
   </div>
 </div>
 
-<!-- ══ SCREEN: WELCOME + TASKS ══════════════════════ -->
-<div class="screen" id="screenWelcome">
-  <div class="welcome-hero">
-    <div class="hero-tag">Bienvenido</div>
-    <div class="hello-text">¡Hola,</div>
-    <div class="employee-name" id="empName">EMPLEADO</div>
-    <div class="welcome-badge">✓ Identificado correctamente</div>
-  </div>
-
-  <div class="gh-strip">
-    <div class="icon">🍅</div>
-    <div class="gh-strip-text">
-      <div class="gh-strip-label">Invernadero</div>
-      <div class="gh-strip-name">M.10 · Tomate Cherry</div>
-    </div>
-  </div>
-
-  <div class="question-block">
-    <div class="question-text">¿Qué vas a hacer hoy?</div>
-    <div class="question-sub">Selecciona tu tarea para registrar la entrada</div>
-  </div>
-
-  <div class="tasks-grid">
-
-    <button class="task-btn t1" onclick="selectTask('Manejo de Cultivo','🌱')">
-      <div class="task-icon">🌱</div>
-      <div>
-        <div class="task-label">Manejo de Cultivo</div>
-        <div class="task-sub">Poda, entutorado, despuntado...</div>
-      </div>
-      <div class="task-arrow">›</div>
-    </button>
-
-    <button class="task-btn t2" onclick="selectTask('Polinizaciones','🐝')">
-      <div class="task-icon">🐝</div>
-      <div>
-        <div class="task-label">Polinizaciones</div>
-        <div class="task-sub">Vibración y control de polinización</div>
-      </div>
-      <div class="task-arrow">›</div>
-    </button>
-
-    <button class="task-btn t3" onclick="selectTask('Preparación Invernadero','🏗️')">
-      <div class="task-icon">🏗️</div>
-      <div>
-        <div class="task-label">Preparación Invernadero</div>
-        <div class="task-sub">Instalación, tensado, estructuras...</div>
-      </div>
-      <div class="task-arrow">›</div>
-    </button>
-
-    <button class="task-btn t4" onclick="selectTask('Limpieza de Invernadero','🧹')">
-      <div class="task-icon">🧹</div>
-      <div>
-        <div class="task-label">Limpieza de Invernadero</div>
-        <div class="task-sub">Restos vegetales, desinfección...</div>
-      </div>
-      <div class="task-arrow">›</div>
-    </button>
-
-    <button class="task-btn t5" onclick="selectTask('Muestras','🔬')">
-      <div class="task-icon">🔬</div>
-      <div>
-        <div class="task-label">Muestras</div>
-        <div class="task-sub">Recogida y etiquetado de muestras</div>
-      </div>
-      <div class="task-arrow">›</div>
-    </button>
-
-    <button class="task-btn t6" onclick="selectTask('Scouting','🔍')">
-      <div class="task-icon">🔍</div>
-      <div>
-        <div class="task-label">Scouting</div>
-        <div class="task-sub">Inspección visual de plagas y enfermedades</div>
-      </div>
-      <div class="task-arrow">›</div>
-    </button>
-
-    <button class="task-btn finish" onclick="selectTask('HE TERMINADO','✅')">
-      <div class="task-icon">✅</div>
-      <div>
-        <div class="task-label">HE TERMINADO</div>
-        <div class="task-sub">Registrar salida y cerrar jornada</div>
-      </div>
-      <div class="task-arrow">›</div>
-    </button>
-
-  </div>
-  <div class="screen-pad-bottom"></div>
-</div>
-
-<!-- ══ SCREEN: DONE ══════════════════════════════ -->
-<div class="screen" id="screenDone">
-  <div class="done-icon" id="doneIcon">✅</div>
-  <div class="done-name" id="doneName">EMPLEADO</div>
-  <div class="done-task" id="doneTask">Tarea registrada</div>
-  <div class="done-time" id="doneTime">12:00 — Hoy</div>
-  <div class="done-next">Abriendo cámara para el siguiente...</div>
-</div>
-
-<!-- LOG -->
-<div class="log-panel" id="logPanel"></div>
-
+<!-- jsQR -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
-// ════════════════════════════════════════
-//  JSQR (lib escaneado QR en navegador)
-//  CDN sin necesidad de instalación
-// ════════════════════════════════════════
-const JSQR_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js';
+  const video     = document.getElementById('video');
+  const screenCam = document.getElementById('screen-camera');
+  const screenWel = document.getElementById('screen-welcome');
+  const nombreEl  = document.getElementById('nombre-empleado');
+  const flash     = document.getElementById('flash');
+  const toast     = document.getElementById('toast');
 
-let jsQRLoaded = false;
-let scanning   = false;
-let stream     = null;
-let scanTimer  = null;
-let currentEmployee = '';
+  let scanning = false;
+  let canvas, ctx;
+  let currentNombre = '';
 
-const videoEl   = document.getElementById('videoEl');
-const canvasEl  = document.getElementById('canvasEl');
-const camStatus = document.getElementById('camStatus');
-const logPanel  = document.getElementById('logPanel');
-
-// ── Load jsQR dynamically ──────────────
-function loadJsQR() {
-  return new Promise((resolve, reject) => {
-    if (window.jsQR) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = JSQR_URL;
-    s.onload  = () => { jsQRLoaded = true; resolve(); };
-    s.onerror = () => reject(new Error('No se pudo cargar jsQR'));
-    document.head.appendChild(s);
-  });
-}
-
-// ── INIT ──────────────────────────────
-window.addEventListener('DOMContentLoaded', async () => {
-  log('Sistema iniciado','ok');
-  try {
-    await loadJsQR();
-    log('Librería QR cargada','ok');
-  } catch(e) {
-    log('Error cargando jsQR: '+e.message,'err');
-    setStatus('Error: no se pudo cargar el escáner QR', true);
-    return;
-  }
-  startCamera();
-});
-
-// ── CAMERA ────────────────────────────
-async function startCamera() {
-  scanning = false;
-  if (stream) {
-    stream.getTracks().forEach(t => t.stop());
-    stream = null;
-  }
-
-  showScreen('screenCamera');
-  setStatus('Iniciando cámara selfie...');
-
-  try {
-    // Selfie camera: facingMode = 'user'
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: 'user' },
-        width:  { ideal: 1280 },
-        height: { ideal: 720 }
-      },
-      audio: false
+  /* ── SONIDO BIENVENIDA (Web Audio API) ── */
+  function playBienvenida() {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // Do Mi Sol Do8
+    notes.forEach((freq, i) => {
+      const osc = ac.createOscillator();
+      const gain = ac.createGain();
+      osc.connect(gain); gain.connect(ac.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ac.currentTime + i * 0.14);
+      gain.gain.setValueAtTime(0.22, ac.currentTime + i * 0.14);
+      gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + i * 0.14 + 0.35);
+      osc.start(ac.currentTime + i * 0.14);
+      osc.stop(ac.currentTime + i * 0.14 + 0.35);
     });
-    videoEl.srcObject = stream;
-    await videoEl.play();
-    setStatus('Cámara lista — muestra tu QR');
-    log('Cámara selfie activa','ok');
-    scanning = true;
-    requestAnimationFrame(scanFrame);
-  } catch(e) {
-    log('Error cámara: '+e.message,'err');
-    // Fallback: any camera
+  }
+
+  function playClick() {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.type = 'sine'; osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.15, ac.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.15);
+    osc.start(); osc.stop(ac.currentTime + 0.15);
+  }
+
+  /* ── FLASH VISUAL ── */
+  function doFlash() {
+    flash.classList.add('pop');
+    setTimeout(() => flash.classList.remove('pop'), 120);
+  }
+
+  /* ── TOAST ── */
+  function showToast(msg, ms = 2200) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), ms);
+  }
+
+  /* ── INICIO CÁMARA (selfie) ── */
+  async function startCamera() {
+    screenCam.style.display = 'flex';
+    screenWel.classList.remove('active');
+    scanning = false;
+
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      videoEl.srcObject = stream;
-      await videoEl.play();
-      setStatus('Cámara lista — muestra tu QR');
+      // Detener stream anterior si existe
+      if (video.srcObject) {
+        video.srcObject.getTracks().forEach(t => t.stop());
+        video.srcObject = null;
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+
+      video.srcObject = stream;
+      await video.play();
+
+      if (!canvas) {
+        canvas = document.createElement('canvas');
+        ctx = canvas.getContext('2d', { willReadFrequently: true });
+      }
+
       scanning = true;
       requestAnimationFrame(scanFrame);
-    } catch(e2) {
-      setStatus('Sin acceso a cámara: '+e2.message, true);
+    } catch (err) {
+      showToast('⚠️ No se pudo acceder a la cámara');
+      console.error(err);
     }
   }
-}
 
-// ── SCAN LOOP ─────────────────────────
-function scanFrame() {
-  if (!scanning) return;
-
-  if (videoEl.readyState === videoEl.HAVE_ENOUGH_DATA) {
-    const w = videoEl.videoWidth;
-    const h = videoEl.videoHeight;
-    if (w > 0 && h > 0) {
-      canvasEl.width  = w;
-      canvasEl.height = h;
-      const ctx = canvasEl.getContext('2d');
-      // Mirror for selfie display (canvas already mirrored via CSS if needed)
-      ctx.drawImage(videoEl, 0, 0, w, h);
-      const imgData = ctx.getImageData(0, 0, w, h);
-
-      if (window.jsQR) {
-        const code = jsQR(imgData.data, imgData.width, imgData.height, {
-          inversionAttempts: 'dontInvert'
-        });
-        if (code && code.data && code.data.trim().length > 0) {
-          const qrText = code.data.trim();
-          log('QR detectado: ' + qrText, 'ok');
-          onQRDetected(qrText);
-          return; // stop loop
-        }
+  /* ── SCAN QR ── */
+  function scanFrame() {
+    if (!scanning) return;
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.width  = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+      const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(img.data, img.width, img.height, { inversionAttempts: 'dontInvert' });
+      if (code && code.data.trim()) {
+        scanning = false;
+        video.srcObject?.getTracks().forEach(t => t.stop());
+        onQRDetected(code.data.trim());
+        return;
       }
     }
-  }
-  requestAnimationFrame(scanFrame);
-}
-
-// ── QR DETECTED ───────────────────────
-function onQRDetected(text) {
-  scanning = false;
-
-  // Stop camera
-  if (stream) {
-    stream.getTracks().forEach(t => t.stop());
-    stream = null;
+    requestAnimationFrame(scanFrame);
   }
 
-  // The QR content IS the employee name
-  currentEmployee = text;
-
-  // Sound: beep + speech
-  playBeep();
-  setTimeout(() => {
-    speakWelcome(text);
-  }, 200);
-
-  // Update welcome screen
-  document.getElementById('empName').textContent = text.toUpperCase();
-
-  // Animate in
-  showScreen('screenWelcome');
-  log('Bienvenido: ' + text, 'ok');
-}
-
-// ── TASK SELECTED ─────────────────────
-function selectTask(taskName, icon) {
-  const now   = new Date();
-  const timeStr = now.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
-  const dateStr = now.toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'});
-
-  // Done screen
-  document.getElementById('doneIcon').textContent = icon;
-  document.getElementById('doneName').textContent = currentEmployee.toUpperCase();
-  document.getElementById('doneTask').textContent = taskName;
-  document.getElementById('doneTime').textContent = timeStr + ' · ' + dateStr;
-
-  playClick();
-  showScreen('screenDone');
-  log(currentEmployee + ' → ' + taskName + ' [' + timeStr + ']', 'ok');
-
-  // Back to camera after 2.5s
-  setTimeout(() => {
-    startCamera();
-  }, 2500);
-}
-
-// ═══════════════════════════════════════
-//  SOUND
-// ═══════════════════════════════════════
-let audioCtx = null;
-function getAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  return audioCtx;
-}
-
-function playBeep() {
-  try {
-    const ctx  = getAudio();
-    const osc  = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.08);
-    gain.gain.setValueAtTime(0.4, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.25);
-  } catch(e) {}
-}
-
-function playClick() {
-  try {
-    const ctx  = getAudio();
-    const osc  = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(660, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.06);
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.18);
-  } catch(e) {}
-}
-
-function speakWelcome(name) {
-  if (!window.speechSynthesis) return;
-  try {
-    window.speechSynthesis.cancel();
-    const msg = new SpeechSynthesisUtterance(
-      `Hola ${name}, bienvenido al Invernadero M.10, Tomate Cherry. ¿Qué vas a hacer hoy?`
-    );
-    msg.lang  = 'es-ES';
-    msg.rate  = 1.0;
-    msg.pitch = 1.05;
-    msg.volume = 1.0;
-    window.speechSynthesis.speak(msg);
-  } catch(e) {}
-}
-
-// ═══════════════════════════════════════
-//  SCREEN TRANSITIONS
-// ═══════════════════════════════════════
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// ═══════════════════════════════════════
-//  UTILS
-// ═══════════════════════════════════════
-function setStatus(msg, isError=false) {
-  camStatus.textContent = msg;
-  camStatus.className   = 'cam-status' + (isError ? ' error' : '');
-}
-
-function log(msg, type='') {
-  const el  = document.createElement('div');
-  const now = new Date().toLocaleTimeString('es',{hour12:false});
-  el.className  = 'log-entry ' + type;
-  el.textContent = `[${now}] ${msg}`;
-  logPanel.appendChild(el);
-  logPanel.scrollTop = logPanel.scrollHeight;
-}
-
-// Tap camera area 5 times to show/hide log
-let tapCount = 0;
-document.getElementById('screenCamera').addEventListener('click', () => {
-  tapCount++;
-  if (tapCount >= 5) {
-    tapCount = 0;
-    logPanel.classList.toggle('visible');
+  /* ── QR DETECTADO ── */
+  function onQRDetected(nombre) {
+    doFlash();
+    playBienvenida();
+    currentNombre = nombre.toUpperCase();
+    nombreEl.textContent = currentNombre;
+    screenCam.style.display = 'none';
+    screenWel.classList.add('active');
+    screenWel.scrollTop = 0;
   }
-});
+
+  /* ── BOTONES TAREA ── */
+  function registrar(tarea) {
+    playClick();
+    showToast(`✅ Registrado: ${tarea}`);
+    console.log(`[${new Date().toLocaleTimeString()}] ${currentNombre} → ${tarea}`);
+  }
+
+  /* ── HE TERMINADO ── */
+  function terminar() {
+    playClick();
+    showToast(`👋 ¡Hasta luego, ${currentNombre}!`);
+    setTimeout(() => startCamera(), 1400);
+  }
+
+  /* ── ARRANQUE ── */
+  startCamera();
 </script>
 </body>
 </html>
