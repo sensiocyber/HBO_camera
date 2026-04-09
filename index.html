@@ -112,15 +112,7 @@
   }
   .btn-task:active { transform:scale(.95); }
 
-  .btn-finish {
-    grid-column:span 2;
-    background:linear-gradient(135deg,var(--rojo) 0%,#b71c1c 100%);
-    border:none; border-radius:14px; padding:17px;
-    color:#fff; font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:3px;
-    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
-    box-shadow:0 4px 20px rgba(229,57,53,.3); transition:transform .15s;
-  }
-  .btn-finish:active { transform:scale(.97); }
+
 
   .btn-confirm-wrap { padding:16px 24px 0; }
   .btn-confirm {
@@ -256,7 +248,7 @@
     <button class="btn-task" data-tarea="Limpieza de Invernadero" onclick="selectTask(this)"><span class="icon">🧹</span>Limpieza de Invernadero</button>
     <button class="btn-task" data-tarea="Muestras"                onclick="selectTask(this)"><span class="icon">🔬</span>Muestras</button>
     <button class="btn-task" data-tarea="Scouting"                onclick="selectTask(this)"><span class="icon">🔍</span>Scouting</button>
-    <button class="btn-finish" onclick="terminar()">✅ &nbsp;HE TERMINADO</button>
+
   </div>
   <div class="btn-confirm-wrap">
     <button class="btn-confirm" id="btn-confirmar-tarea" onclick="goToTime()">CONFIRMAR</button>
@@ -413,11 +405,7 @@ function goToTime() {
   showScreen('screen-time');
 }
 
-function terminar() {
-  playClick();
-  showToast(`👋 ¡Hasta luego, ${currentNombre}!`);
-  setTimeout(() => startCamera(), 1500);
-}
+
 
 /* ══ DRUM WHEELS ══ */
 function buildWheel(key, listId, drumId, items, initIdx) {
@@ -509,16 +497,10 @@ function confirmarTiempo() {
   document.getElementById('gracias-nombre').textContent  = currentNombre;
   document.getElementById('gracias-resumen').textContent = resumen;
 
-  let secs=4;
-  document.getElementById('gracias-timer').textContent=`VOLVIENDO EN ${secs}s…`;
+  document.getElementById('gracias-timer').textContent=`VOLVIENDO A LA CÁMARA…`;
   showScreen('screen-gracias');
   clearTimeout(graciasTid);
-  const tick=()=>{
-    secs--;
-    if(secs>0){ document.getElementById('gracias-timer').textContent=`VOLVIENDO EN ${secs}s…`; graciasTid=setTimeout(tick,1000); }
-    else startCamera();
-  };
-  graciasTid=setTimeout(tick,1000);
+  graciasTid=setTimeout(()=>startCamera(),1000);
   console.log(`[${new Date().toLocaleString()}] ${currentNombre} → ${resumen}`);
 }
 
