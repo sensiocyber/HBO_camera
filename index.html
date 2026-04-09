@@ -150,7 +150,7 @@
   }
   .drum:active { cursor:grabbing; }
 
-  .drum-list { position:absolute; left:0; right:0; will-change:transform; }
+  .drum-list { position:absolute; left:0; right:0; top:75px; will-change:transform; }
 
   .drum-item {
     height:50px; display:flex; align-items:center; justify-content:center;
@@ -200,6 +200,36 @@
   }
   .gracias-timer { font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:3px; color:rgba(126,200,80,.4); }
 
+  /* ══ PANTALLA INICIO ══ */
+  #screen-inicio {
+    background:var(--bg);
+    align-items:center; justify-content:center;
+    text-align:center; padding:40px 32px; gap:20px;
+  }
+  .inicio-logo { font-size:4rem; }
+  .inicio-title {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:2.6rem; letter-spacing:4px; line-height:1.05;
+    color:var(--blanco);
+  }
+  .inicio-title span { color:var(--verde-neon); }
+  .inicio-sub {
+    font-size:.8rem; color:rgba(255,255,255,.45);
+    letter-spacing:1.5px; text-transform:uppercase; line-height:1.6;
+  }
+  .btn-start {
+    margin-top:10px;
+    width:100%; padding:22px;
+    background:linear-gradient(135deg,#3a7d1e,var(--verde-neon));
+    border:none; border-radius:16px;
+    color:#0d1f0d; font-family:'Bebas Neue',sans-serif;
+    font-size:1.8rem; letter-spacing:4px;
+    cursor:pointer; box-shadow:0 6px 28px rgba(126,200,80,.35);
+    transition:transform .15s;
+    display:flex; align-items:center; justify-content:center; gap:12px;
+  }
+  .btn-start:active { transform:scale(.97); }
+
   /* ── Flash + Toast ── */
   #flash { position:fixed; inset:0; background:#fff; opacity:0; pointer-events:none; transition:opacity .1s; z-index:100; }
   #flash.pop { opacity:.65; }
@@ -217,8 +247,18 @@
 <div id="flash"></div>
 <div id="toast"></div>
 
+<!-- ══ INICIO ══ -->
+<div id="screen-inicio" class="screen active">
+  <div class="inicio-logo">🌿</div>
+  <div class="inicio-title">INVERNADERO<br><span>M.10</span></div>
+  <div class="inicio-sub">Tomate Cherry<br>Control de acceso</div>
+  <button class="btn-start" onclick="arrancar()">
+    📷 &nbsp;INICIAR
+  </button>
+</div>
+
 <!-- ══ CÁMARA ══ -->
-<div id="screen-camera" class="screen active">
+<div id="screen-camera" class="screen">
   <div id="header-cam">
     <h1>INVERNADERO M.10</h1>
     <p>Tomate Cherry · Control de Acceso</p>
@@ -344,19 +384,30 @@ function showToast(msg, ms = 2200) {
 
 /* ══ CÁMARA ══ */
 const video = document.getElementById('video');
+let streamReady = false;
 
 async function startCamera() {
   showScreen('screen-camera');
   scanning = false; currentTarea = '';
-  if (video.srcObject) { video.srcObject.getTracks().forEach(t => t.stop()); video.srcObject = null; }
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode:'user', width:{ideal:1280}, height:{ideal:720} }, audio: false
-    });
-    video.srcObject = stream; await video.play();
-    if (!canvas) { canvas = document.createElement('canvas'); ctx = canvas.getContext('2d',{willReadFrequently:true}); }
-    scanning = true; requestAnimationFrame(scanFrame);
-  } catch(e) { showToast('⚠️ No se pudo acceder a la cámara'); }
+
+  // Primera vez: pedir permisos y guardar el stream para siempre
+  if (!streamReady) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode:'user', width:{ideal:1280}, height:{ideal:720} }, audio: false
+      });
+      video.srcObject = stream;
+      if (!canvas) { canvas = document.createElement('canvas'); ctx = canvas.getContext('2d',{willReadFrequently:true}); }
+      streamReady = true;
+    } catch(e) {
+      showToast('⚠️ No se pudo acceder a la cámara'); return;
+    }
+  }
+
+  // Reanudar video si estaba pausado
+  if (video.paused) await video.play();
+  scanning = true;
+  requestAnimationFrame(scanFrame);
 }
 
 function scanFrame() {
@@ -368,7 +419,7 @@ function scanFrame() {
     const code = jsQR(img.data, img.width, img.height, {inversionAttempts:'dontInvert'});
     if (code && code.data.trim()) {
       scanning = false;
-      video.srcObject?.getTracks().forEach(t => t.stop());
+      // NO paramos el stream, solo dejamos de escanear
       onQRDetected(code.data.trim()); return;
     }
   }
@@ -410,19 +461,14 @@ function goToTime() {
 /* ══ DRUM WHEELS ══ */
 function buildWheel(key, listId, drumId, items, initIdx) {
   const list = document.getElementById(listId);
-  const PAD  = 2;
   list.innerHTML = '';
-
-  for(let i=0;i<PAD;i++) { const d=document.createElement('div'); d.className='drum-item'; list.appendChild(d); }
   items.forEach((v,i) => {
     const d = document.createElement('div');
     d.className = 'drum-item' + (i===initIdx?' center':'');
     d.textContent = String(v).padStart(2,'0');
     list.appendChild(d);
   });
-  for(let i=0;i<PAD;i++) { const d=document.createElement('div'); d.className='drum-item'; list.appendChild(d); }
-
-  wheels[key] = { list, drum: document.getElementById(drumId), items, index: initIdx, PAD };
+  wheels[key] = { list, drum: document.getElementById(drumId), items, index: initIdx, PAD: 0 };
   _applyWheelPos(key, false);
   _addDrumGestures(key);
 }
@@ -507,7 +553,11 @@ function confirmarTiempo() {
 /* ══ INIT ══ */
 buildWheel('h','list-h','drum-h', Array.from({length:13},(_,i)=>i), 1);
 buildWheel('m','list-m','drum-m', Array.from({length:60},(_,i)=>i), 0);
-startCamera();
+
+function arrancar() {
+  playClick();
+  startCamera();
+}
 </script>
 </body>
 </html>
