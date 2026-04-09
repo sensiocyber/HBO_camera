@@ -8,449 +8,524 @@
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap');
 
   :root {
-    --verde: #2d6a2d;
-    --verde-claro: #4caf50;
     --verde-neon: #7ec850;
-    --amarillo: #f5c842;
     --rojo: #e53935;
     --blanco: #f9fbf7;
     --gris: #1a1f1a;
+    --bg: linear-gradient(160deg,#0d1f0d 0%,#1a2e14 55%,#0f1a0f 100%);
     --card-bg: rgba(255,255,255,0.06);
+    --card-sel: rgba(126,200,80,0.18);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 
   body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--gris);
-    color: var(--blanco);
-    min-height: 100dvh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    font-family:'DM Sans',sans-serif;
+    background:var(--gris); color:var(--blanco);
+    height:100dvh; overflow:hidden;
   }
 
-  /* ── PANTALLA CAMARA ── */
-  #screen-camera {
-    position: fixed; inset: 0;
-    display: flex; flex-direction: column;
-    background: #000;
-  }
+  /* ── SCREENS ── */
+  .screen { position:fixed; inset:0; display:none; flex-direction:column; }
+  .screen.active { display:flex; }
+
+  /* ══════════════ CÁMARA ══════════════ */
+  #screen-camera { background:#000; }
 
   #header-cam {
-    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
-    padding: 20px 20px 12px;
-    background: linear-gradient(to bottom, rgba(0,0,0,.75) 0%, transparent 100%);
-    text-align: center;
+    position:absolute; top:0; left:0; right:0; z-index:10;
+    padding:22px 20px 14px;
+    background:linear-gradient(to bottom,rgba(0,0,0,.85),transparent);
+    text-align:center;
   }
   #header-cam h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.6rem;
-    letter-spacing: 3px;
-    color: var(--verde-neon);
-    line-height: 1;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:1.65rem; letter-spacing:3px; color:var(--verde-neon);
   }
-  #header-cam p {
-    font-size: .75rem;
-    color: rgba(255,255,255,.6);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
+  #header-cam p { font-size:.72rem; color:rgba(255,255,255,.5); letter-spacing:1.5px; text-transform:uppercase; margin-top:3px; }
 
-  #video {
-    width: 100%; height: 100%;
-    object-fit: cover;
-  }
+  #video { width:100%; height:100%; object-fit:cover; }
 
-  #overlay {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
+  #overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .qr-frame { width:220px; height:220px; position:relative; }
+  .qr-frame::before,.qr-frame::after,.qr-frame span::before,.qr-frame span::after {
+    content:''; position:absolute; width:36px; height:36px;
+    border-color:var(--verde-neon); border-style:solid;
   }
-  .qr-frame {
-    width: 220px; height: 220px;
-    position: relative;
-  }
-  .qr-frame::before, .qr-frame::after,
-  .qr-frame span::before, .qr-frame span::after {
-    content: '';
-    position: absolute;
-    width: 36px; height: 36px;
-    border-color: var(--verde-neon);
-    border-style: solid;
-  }
-  .qr-frame::before  { top: 0;    left: 0;  border-width: 3px 0 0 3px; }
-  .qr-frame::after   { top: 0;    right: 0; border-width: 3px 3px 0 0; }
-  .qr-frame span::before { bottom: 0; left: 0;  border-width: 0 0 3px 3px; }
-  .qr-frame span::after  { bottom: 0; right: 0; border-width: 0 3px 3px 0; }
-
+  .qr-frame::before  { top:0;    left:0;  border-width:3px 0 0 3px; }
+  .qr-frame::after   { top:0;    right:0; border-width:3px 3px 0 0; }
+  .qr-frame span::before { bottom:0; left:0;  border-width:0 0 3px 3px; }
+  .qr-frame span::after  { bottom:0; right:0; border-width:0 3px 3px 0; }
   .scan-line {
-    position: absolute; top: 0; left: 4px; right: 4px; height: 2px;
-    background: linear-gradient(to right, transparent, var(--verde-neon), transparent);
-    animation: scan 2s linear infinite;
-    box-shadow: 0 0 8px var(--verde-neon);
+    position:absolute; top:0; left:4px; right:4px; height:2px;
+    background:linear-gradient(to right,transparent,var(--verde-neon),transparent);
+    animation:scan 2s linear infinite; box-shadow:0 0 8px var(--verde-neon);
   }
-  @keyframes scan { 0%{top:0} 100%{top:100%} }
+  @keyframes scan{0%{top:0}100%{top:100%}}
+  #cam-hint { position:absolute; bottom:50px; left:0; right:0; text-align:center; font-size:.8rem; color:rgba(255,255,255,.5); letter-spacing:1px; }
 
-  #cam-hint {
-    position: absolute; bottom: 50px; left: 0; right: 0;
-    text-align: center;
-    font-size: .8rem;
-    color: rgba(255,255,255,.55);
-    letter-spacing: 1px;
-  }
+  /* ══════════════ BIENVENIDA ══════════════ */
+  #screen-welcome { background:var(--bg); overflow-y:auto; padding-bottom:32px; }
 
-  /* ── PANTALLA BIENVENIDA ── */
-  #screen-welcome {
-    display: none;
-    position: fixed; inset: 0;
-    flex-direction: column;
-    background: linear-gradient(160deg, #0d1f0d 0%, #1a2e14 50%, #0f1a0f 100%);
-    overflow-y: auto;
-    padding-bottom: 30px;
-  }
-  #screen-welcome.active { display: flex; }
-
-  .welcome-top {
-    padding: 36px 24px 20px;
-    text-align: center;
-    position: relative;
-  }
+  .welcome-top { padding:30px 24px 16px; text-align:center; }
   .welcome-top::after {
-    content: '';
-    display: block;
-    height: 2px;
-    background: linear-gradient(to right, transparent, var(--verde-neon), transparent);
-    margin-top: 20px;
+    content:''; display:block; height:2px;
+    background:linear-gradient(to right,transparent,var(--verde-neon),transparent);
+    margin-top:16px;
   }
-
   .badge {
-    display: inline-block;
-    background: rgba(126,200,80,.12);
-    border: 1px solid rgba(126,200,80,.3);
-    border-radius: 40px;
-    padding: 4px 14px;
-    font-size: .68rem;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--verde-neon);
-    margin-bottom: 14px;
+    display:inline-block;
+    background:rgba(126,200,80,.1); border:1px solid rgba(126,200,80,.3);
+    border-radius:40px; padding:4px 14px;
+    font-size:.68rem; letter-spacing:2.5px; text-transform:uppercase;
+    color:var(--verde-neon); margin-bottom:10px;
   }
-
-  .welcome-top h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.4rem;
-    line-height: 1.05;
-    letter-spacing: 2px;
-  }
-  .welcome-top h2 span { color: var(--verde-neon); }
-
-  .welcome-top .subtitulo {
-    font-size: .85rem;
-    color: rgba(255,255,255,.55);
-    margin-top: 6px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
+  .welcome-top h2 { font-family:'Bebas Neue',sans-serif; font-size:2.2rem; line-height:1.05; letter-spacing:2px; }
+  .welcome-top h2 span { color:var(--verde-neon); }
+  .welcome-top .subtitulo { font-size:.78rem; color:rgba(255,255,255,.5); margin-top:4px; letter-spacing:1px; text-transform:uppercase; }
 
   .question-row {
-    margin: 0 24px;
-    padding: 16px 20px;
-    background: rgba(126,200,80,.07);
-    border-left: 3px solid var(--verde-neon);
-    border-radius: 0 10px 10px 0;
+    margin:0 24px 14px; padding:13px 18px;
+    background:rgba(126,200,80,.07); border-left:3px solid var(--verde-neon); border-radius:0 10px 10px 0;
   }
-  .question-row p {
-    font-size: .72rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--verde-neon);
-    margin-bottom: 2px;
-  }
-  .question-row h3 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.5rem;
-    letter-spacing: 2px;
-    color: var(--blanco);
-  }
+  .question-row p { font-size:.68rem; letter-spacing:2px; text-transform:uppercase; color:var(--verde-neon); margin-bottom:2px; }
+  .question-row h3 { font-family:'Bebas Neue',sans-serif; font-size:1.45rem; letter-spacing:2px; }
 
-  .btn-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    padding: 16px 24px 0;
-  }
+  .btn-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 24px; }
 
   .btn-task {
-    background: var(--card-bg);
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 14px;
-    padding: 18px 12px;
-    text-align: center;
-    color: var(--blanco);
-    font-family: 'DM Sans', sans-serif;
-    font-size: .82rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all .18s ease;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 8px;
-    min-height: 90px;
-    -webkit-tap-highlight-color: transparent;
-    position: relative;
-    overflow: hidden;
+    background:var(--card-bg); border:1.5px solid rgba(255,255,255,.1);
+    border-radius:14px; padding:15px 10px;
+    color:var(--blanco); font-family:'DM Sans',sans-serif; font-size:.8rem; font-weight:500;
+    cursor:pointer; transition:all .15s;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:7px; min-height:86px; position:relative; overflow:hidden; user-select:none;
   }
-  .btn-task::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(126,200,80,.15), transparent);
-    opacity: 0;
-    transition: opacity .18s;
+  .btn-task .icon { font-size:1.45rem; }
+  .btn-task.selected {
+    background:var(--card-sel); border-color:rgba(126,200,80,.8);
+    box-shadow:0 0 16px rgba(126,200,80,.22);
   }
-  .btn-task:active::before { opacity: 1; }
-  .btn-task:active { transform: scale(.96); border-color: var(--verde-neon); }
-
-  .btn-task .icon { font-size: 1.6rem; }
+  .btn-task.selected::after {
+    content:'✓'; position:absolute; top:6px; right:9px;
+    font-size:.75rem; color:var(--verde-neon); font-weight:700;
+  }
+  .btn-task:active { transform:scale(.95); }
 
   .btn-finish {
-    grid-column: span 2;
-    background: linear-gradient(135deg, var(--rojo) 0%, #b71c1c 100%);
-    border: none;
-    border-radius: 14px;
-    padding: 20px;
-    color: #fff;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 3px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    transition: transform .18s, box-shadow .18s;
-    box-shadow: 0 4px 20px rgba(229,57,53,.4);
+    grid-column:span 2;
+    background:linear-gradient(135deg,var(--rojo) 0%,#b71c1c 100%);
+    border:none; border-radius:14px; padding:17px;
+    color:#fff; font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:3px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
+    box-shadow:0 4px 20px rgba(229,57,53,.3); transition:transform .15s;
   }
-  .btn-finish:active { transform: scale(.97); }
+  .btn-finish:active { transform:scale(.97); }
 
-  /* ── FLASH ── */
-  #flash {
-    position: fixed; inset: 0; background: #fff;
-    opacity: 0; pointer-events: none;
-    transition: opacity .1s;
-    z-index: 100;
+  .btn-confirm-wrap { padding:16px 24px 0; }
+  .btn-confirm {
+    width:100%; padding:17px;
+    background:linear-gradient(135deg,#3a7d1e,var(--verde-neon));
+    border:none; border-radius:14px;
+    color:#0d1f0d; font-family:'Bebas Neue',sans-serif; font-size:1.45rem; letter-spacing:3px;
+    cursor:pointer; box-shadow:0 4px 20px rgba(126,200,80,.25);
+    opacity:.35; pointer-events:none; transition:all .2s;
   }
-  #flash.pop { opacity: .7; }
+  .btn-confirm.enabled { opacity:1; pointer-events:all; }
+  .btn-confirm:active { transform:scale(.97); }
 
-  /* ── TOAST ── */
+  /* ══════════════ TIEMPO ══════════════ */
+  #screen-time {
+    background:var(--bg);
+    align-items:center; justify-content:center;
+    padding:28px 22px; gap:22px;
+  }
+
+  .time-header { text-align:center; }
+  .time-header h2 { font-family:'Bebas Neue',sans-serif; font-size:1.75rem; letter-spacing:2px; line-height:1.15; }
+  .time-header h2 em { color:var(--verde-neon); font-style:normal; }
+  .time-header p { font-size:.75rem; color:rgba(255,255,255,.45); margin-top:4px; letter-spacing:1px; }
+
+  /* Ruedas */
+  .wheels-wrap { display:flex; align-items:flex-start; justify-content:center; gap:6px; width:100%; }
+  .wheel-col { display:flex; flex-direction:column; align-items:center; gap:8px; flex:1; max-width:150px; }
+  .wheel-label { font-size:.68rem; letter-spacing:2.5px; text-transform:uppercase; color:var(--verde-neon); }
+
+  .drum {
+    width:100%; height:200px; position:relative; overflow:hidden;
+    border-radius:16px; background:rgba(0,0,0,.4);
+    border:1px solid rgba(126,200,80,.2); cursor:grab; touch-action:none;
+  }
+  .drum:active { cursor:grabbing; }
+
+  .drum-list { position:absolute; left:0; right:0; will-change:transform; }
+
+  .drum-item {
+    height:50px; display:flex; align-items:center; justify-content:center;
+    font-family:'Bebas Neue',sans-serif; font-size:2.1rem; letter-spacing:2px;
+    color:rgba(255,255,255,.2); user-select:none;
+    transition:color .1s, font-size .1s;
+  }
+  .drum-item.center { color:var(--blanco); font-size:2.4rem; }
+
+  /* gradientes sobre las ruedas */
+  .drum::before,.drum::after {
+    content:''; position:absolute; left:0; right:0; z-index:2; pointer-events:none;
+  }
+  .drum::before { top:0; height:72px; background:linear-gradient(to bottom,rgba(13,31,13,.95),rgba(13,31,13,0)); }
+  .drum::after  { bottom:0; height:72px; background:linear-gradient(to top,rgba(13,31,13,.95),rgba(13,31,13,0)); }
+  .drum-selector {
+    position:absolute; top:50%; left:10px; right:10px; height:50px; margin-top:-25px;
+    border-top:2px solid rgba(126,200,80,.45); border-bottom:2px solid rgba(126,200,80,.45);
+    pointer-events:none; z-index:3; border-radius:4px;
+  }
+
+  .sep { font-family:'Bebas Neue',sans-serif; font-size:2.6rem; color:rgba(255,255,255,.25); padding:0 4px; margin-top:38px; }
+
+  .btn-confirm-time {
+    width:100%; padding:17px;
+    background:linear-gradient(135deg,#3a7d1e,var(--verde-neon));
+    border:none; border-radius:14px;
+    color:#0d1f0d; font-family:'Bebas Neue',sans-serif; font-size:1.45rem; letter-spacing:3px;
+    cursor:pointer; box-shadow:0 4px 20px rgba(126,200,80,.25); transition:transform .15s;
+  }
+  .btn-confirm-time:active { transform:scale(.97); }
+
+  /* ══════════════ GRACIAS ══════════════ */
+  #screen-gracias {
+    background:var(--bg);
+    align-items:center; justify-content:center;
+    text-align:center; padding:40px 28px; gap:14px;
+  }
+  .gracias-icon { font-size:4.5rem; }
+  .gracias-title { font-family:'Bebas Neue',sans-serif; font-size:3.2rem; letter-spacing:4px; color:var(--verde-neon); }
+  .gracias-sub { font-size:.9rem; color:rgba(255,255,255,.6); line-height:1.6; }
+  .gracias-sub strong { color:var(--blanco); font-size:1rem; }
+  .gracias-tag {
+    background:rgba(126,200,80,.1); border:1px solid rgba(126,200,80,.3);
+    border-radius:30px; padding:6px 18px;
+    font-size:.8rem; color:var(--verde-neon); letter-spacing:1px;
+  }
+  .gracias-timer { font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:3px; color:rgba(126,200,80,.4); }
+
+  /* ── Flash + Toast ── */
+  #flash { position:fixed; inset:0; background:#fff; opacity:0; pointer-events:none; transition:opacity .1s; z-index:100; }
+  #flash.pop { opacity:.65; }
   #toast {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: rgba(30,50,20,.95);
-    border: 1px solid var(--verde-neon);
-    color: var(--blanco);
-    padding: 10px 22px;
-    border-radius: 30px;
-    font-size: .82rem;
-    white-space: nowrap;
-    opacity: 0;
-    transition: all .3s;
-    z-index: 200;
+    position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:rgba(15,35,10,.95); border:1px solid var(--verde-neon);
+    color:var(--blanco); padding:10px 22px; border-radius:30px;
+    font-size:.8rem; white-space:nowrap; opacity:0; transition:all .3s; z-index:200;
   }
-  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
-<!-- FLASH -->
 <div id="flash"></div>
-<!-- TOAST -->
 <div id="toast"></div>
 
-<!-- PANTALLA CÁMARA -->
-<div id="screen-camera">
+<!-- ══ CÁMARA ══ -->
+<div id="screen-camera" class="screen active">
   <div id="header-cam">
     <h1>INVERNADERO M.10</h1>
     <p>Tomate Cherry · Control de Acceso</p>
   </div>
   <video id="video" playsinline autoplay muted></video>
   <div id="overlay">
-    <div class="qr-frame"><span></span>
-      <div class="scan-line"></div>
-    </div>
+    <div class="qr-frame"><span></span><div class="scan-line"></div></div>
   </div>
   <div id="cam-hint">📷 Apunta el QR de tu tarjeta</div>
 </div>
 
-<!-- PANTALLA BIENVENIDA -->
-<div id="screen-welcome">
+<!-- ══ SELECCIÓN TAREA ══ -->
+<div id="screen-welcome" class="screen">
   <div class="welcome-top">
     <div class="badge">🌿 Invernadero M.10</div>
     <h2>¡HOLA, <span id="nombre-empleado">EMPLEADO</span>!</h2>
-    <p class="subtitulo">Bienvenido al Invernadero M.10<br>Tomate Cherry</p>
+    <p class="subtitulo">Bienvenido · Tomate Cherry</p>
   </div>
-
   <div class="question-row">
     <p>Registro de actividad</p>
     <h3>¿QUÉ VAS A HACER HOY?</h3>
   </div>
-
   <div class="btn-grid">
-    <button class="btn-task" onclick="registrar('Manejo de Cultivo')">
-      <span class="icon">🌱</span>Manejo de Cultivo
-    </button>
-    <button class="btn-task" onclick="registrar('Polinizaciones')">
-      <span class="icon">🐝</span>Polinizaciones
-    </button>
-    <button class="btn-task" onclick="registrar('Preparación Invernadero')">
-      <span class="icon">🏗️</span>Preparación Invernadero
-    </button>
-    <button class="btn-task" onclick="registrar('Limpieza de Invernadero')">
-      <span class="icon">🧹</span>Limpieza de Invernadero
-    </button>
-    <button class="btn-task" onclick="registrar('Muestras')">
-      <span class="icon">🔬</span>Muestras
-    </button>
-    <button class="btn-task" onclick="registrar('Scouting')">
-      <span class="icon">🔍</span>Scouting
-    </button>
-    <button class="btn-finish" onclick="terminar()">
-      ✅ &nbsp;HE TERMINADO
-    </button>
+    <button class="btn-task" data-tarea="Manejo de Cultivo"       onclick="selectTask(this)"><span class="icon">🌱</span>Manejo de Cultivo</button>
+    <button class="btn-task" data-tarea="Polinizaciones"          onclick="selectTask(this)"><span class="icon">🐝</span>Polinizaciones</button>
+    <button class="btn-task" data-tarea="Preparación Invernadero" onclick="selectTask(this)"><span class="icon">🏗️</span>Preparación Invernadero</button>
+    <button class="btn-task" data-tarea="Limpieza de Invernadero" onclick="selectTask(this)"><span class="icon">🧹</span>Limpieza de Invernadero</button>
+    <button class="btn-task" data-tarea="Muestras"                onclick="selectTask(this)"><span class="icon">🔬</span>Muestras</button>
+    <button class="btn-task" data-tarea="Scouting"                onclick="selectTask(this)"><span class="icon">🔍</span>Scouting</button>
+    <button class="btn-finish" onclick="terminar()">✅ &nbsp;HE TERMINADO</button>
+  </div>
+  <div class="btn-confirm-wrap">
+    <button class="btn-confirm" id="btn-confirmar-tarea" onclick="goToTime()">CONFIRMAR</button>
   </div>
 </div>
 
-<!-- jsQR -->
+<!-- ══ TIEMPO ══ -->
+<div id="screen-time" class="screen">
+  <div class="time-header">
+    <div class="badge">⏱ Registro de tiempo</div>
+    <h2>¿CUÁNTO TIEMPO HAS ESTADO<br><em id="tarea-label">TRABAJANDO</em>?</h2>
+    <p>Gira las ruedas para seleccionar</p>
+  </div>
+  <div class="wheels-wrap">
+    <div class="wheel-col">
+      <div class="wheel-label">Horas</div>
+      <div class="drum" id="drum-h">
+        <div class="drum-selector"></div>
+        <div class="drum-list" id="list-h"></div>
+      </div>
+    </div>
+    <div class="sep">:</div>
+    <div class="wheel-col">
+      <div class="wheel-label">Minutos</div>
+      <div class="drum" id="drum-m">
+        <div class="drum-selector"></div>
+        <div class="drum-list" id="list-m"></div>
+      </div>
+    </div>
+  </div>
+  <button class="btn-confirm-time" onclick="confirmarTiempo()">CONFIRMAR</button>
+</div>
+
+<!-- ══ GRACIAS ══ -->
+<div id="screen-gracias" class="screen">
+  <div class="gracias-icon">✅</div>
+  <div class="gracias-title">¡GRACIAS!</div>
+  <div class="gracias-sub">
+    <strong id="gracias-nombre">EMPLEADO</strong><br>
+    Tu registro ha sido guardado correctamente.
+  </div>
+  <div class="gracias-tag" id="gracias-resumen"></div>
+  <div class="gracias-timer" id="gracias-timer">VOLVIENDO A LA CÁMARA…</div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
-  const video     = document.getElementById('video');
-  const screenCam = document.getElementById('screen-camera');
-  const screenWel = document.getElementById('screen-welcome');
-  const nombreEl  = document.getElementById('nombre-empleado');
-  const flash     = document.getElementById('flash');
-  const toast     = document.getElementById('toast');
+/* ══ ESTADO ══ */
+let scanning = false, canvas, ctx;
+let currentNombre = '', currentTarea = '';
+let graciasTid = null;
+const ITEM_H = 50;
+const wheels  = {};
 
-  let scanning = false;
-  let canvas, ctx;
-  let currentNombre = '';
+/* ══ PANTALLAS ══ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 
-  /* ── SONIDO BIENVENIDA (Web Audio API) ── */
-  function playBienvenida() {
+/* ══ SONIDOS ══ */
+function _play(notes, spacing = 0.14) {
+  try {
     const ac = new (window.AudioContext || window.webkitAudioContext)();
-    const notes = [523.25, 659.25, 783.99, 1046.5]; // Do Mi Sol Do8
-    notes.forEach((freq, i) => {
-      const osc = ac.createOscillator();
-      const gain = ac.createGain();
-      osc.connect(gain); gain.connect(ac.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ac.currentTime + i * 0.14);
-      gain.gain.setValueAtTime(0.22, ac.currentTime + i * 0.14);
-      gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + i * 0.14 + 0.35);
-      osc.start(ac.currentTime + i * 0.14);
-      osc.stop(ac.currentTime + i * 0.14 + 0.35);
+    notes.forEach(([f, d], i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      o.type = 'sine'; o.frequency.value = f;
+      const t = ac.currentTime + i * spacing;
+      g.gain.setValueAtTime(0.18, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + d);
+      o.start(t); o.stop(t + d);
     });
-  }
+  } catch(e) {}
+}
+const playBienvenida = () => _play([[523.25,.35],[659.25,.35],[783.99,.35],[1046.5,.5]]);
+const playClick      = () => _play([[880,.15]], 0);
+const playGracias    = () => _play([[659.25,.35],[783.99,.35],[1046.5,.6]]);
 
-  function playClick() {
-    const ac = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ac.createOscillator();
-    const gain = ac.createGain();
-    osc.connect(gain); gain.connect(ac.destination);
-    osc.type = 'sine'; osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.15, ac.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.15);
-    osc.start(); osc.stop(ac.currentTime + 0.15);
-  }
+/* ══ FLASH / TOAST ══ */
+function doFlash() {
+  const f = document.getElementById('flash');
+  f.classList.add('pop');
+  setTimeout(() => f.classList.remove('pop'), 130);
+}
+let _toastTid;
+function showToast(msg, ms = 2200) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_toastTid);
+  _toastTid = setTimeout(() => t.classList.remove('show'), ms);
+}
 
-  /* ── FLASH VISUAL ── */
-  function doFlash() {
-    flash.classList.add('pop');
-    setTimeout(() => flash.classList.remove('pop'), 120);
-  }
+/* ══ CÁMARA ══ */
+const video = document.getElementById('video');
 
-  /* ── TOAST ── */
-  function showToast(msg, ms = 2200) {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), ms);
-  }
+async function startCamera() {
+  showScreen('screen-camera');
+  scanning = false; currentTarea = '';
+  if (video.srcObject) { video.srcObject.getTracks().forEach(t => t.stop()); video.srcObject = null; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode:'user', width:{ideal:1280}, height:{ideal:720} }, audio: false
+    });
+    video.srcObject = stream; await video.play();
+    if (!canvas) { canvas = document.createElement('canvas'); ctx = canvas.getContext('2d',{willReadFrequently:true}); }
+    scanning = true; requestAnimationFrame(scanFrame);
+  } catch(e) { showToast('⚠️ No se pudo acceder a la cámara'); }
+}
 
-  /* ── INICIO CÁMARA (selfie) ── */
-  async function startCamera() {
-    screenCam.style.display = 'flex';
-    screenWel.classList.remove('active');
-    scanning = false;
-
-    try {
-      // Detener stream anterior si existe
-      if (video.srcObject) {
-        video.srcObject.getTracks().forEach(t => t.stop());
-        video.srcObject = null;
-      }
-
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false
-      });
-
-      video.srcObject = stream;
-      await video.play();
-
-      if (!canvas) {
-        canvas = document.createElement('canvas');
-        ctx = canvas.getContext('2d', { willReadFrequently: true });
-      }
-
-      scanning = true;
-      requestAnimationFrame(scanFrame);
-    } catch (err) {
-      showToast('⚠️ No se pudo acceder a la cámara');
-      console.error(err);
+function scanFrame() {
+  if (!scanning) return;
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    const img  = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(img.data, img.width, img.height, {inversionAttempts:'dontInvert'});
+    if (code && code.data.trim()) {
+      scanning = false;
+      video.srcObject?.getTracks().forEach(t => t.stop());
+      onQRDetected(code.data.trim()); return;
     }
   }
+  requestAnimationFrame(scanFrame);
+}
 
-  /* ── SCAN QR ── */
-  function scanFrame() {
-    if (!scanning) return;
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      canvas.width  = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0);
-      const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(img.data, img.width, img.height, { inversionAttempts: 'dontInvert' });
-      if (code && code.data.trim()) {
-        scanning = false;
-        video.srcObject?.getTracks().forEach(t => t.stop());
-        onQRDetected(code.data.trim());
-        return;
-      }
-    }
-    requestAnimationFrame(scanFrame);
-  }
+function onQRDetected(nombre) {
+  doFlash(); playBienvenida();
+  currentNombre = nombre.toUpperCase();
+  document.getElementById('nombre-empleado').textContent = currentNombre;
+  document.querySelectorAll('.btn-task').forEach(b => b.classList.remove('selected'));
+  document.getElementById('btn-confirmar-tarea').classList.remove('enabled');
+  currentTarea = '';
+  showScreen('screen-welcome');
+  document.getElementById('screen-welcome').scrollTop = 0;
+}
 
-  /* ── QR DETECTADO ── */
-  function onQRDetected(nombre) {
-    doFlash();
-    playBienvenida();
-    currentNombre = nombre.toUpperCase();
-    nombreEl.textContent = currentNombre;
-    screenCam.style.display = 'none';
-    screenWel.classList.add('active');
-    screenWel.scrollTop = 0;
-  }
+/* ══ SELECCIÓN TAREA ══ */
+function selectTask(btn) {
+  playClick();
+  document.querySelectorAll('.btn-task').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  currentTarea = btn.dataset.tarea;
+  document.getElementById('btn-confirmar-tarea').classList.add('enabled');
+}
 
-  /* ── BOTONES TAREA ── */
-  function registrar(tarea) {
-    playClick();
-    showToast(`✅ Registrado: ${tarea}`);
-    console.log(`[${new Date().toLocaleTimeString()}] ${currentNombre} → ${tarea}`);
-  }
+function goToTime() {
+  if (!currentTarea) return;
+  playClick();
+  document.getElementById('tarea-label').textContent = currentTarea.toUpperCase();
+  // reset ruedas a 1h 0min
+  setWheelIdx('h', 1, true);
+  setWheelIdx('m', 0, true);
+  showScreen('screen-time');
+}
 
-  /* ── HE TERMINADO ── */
-  function terminar() {
-    playClick();
-    showToast(`👋 ¡Hasta luego, ${currentNombre}!`);
-    setTimeout(() => startCamera(), 1400);
-  }
+function terminar() {
+  playClick();
+  showToast(`👋 ¡Hasta luego, ${currentNombre}!`);
+  setTimeout(() => startCamera(), 1500);
+}
 
-  /* ── ARRANQUE ── */
-  startCamera();
+/* ══ DRUM WHEELS ══ */
+function buildWheel(key, listId, drumId, items, initIdx) {
+  const list = document.getElementById(listId);
+  const PAD  = 2;
+  list.innerHTML = '';
+
+  for(let i=0;i<PAD;i++) { const d=document.createElement('div'); d.className='drum-item'; list.appendChild(d); }
+  items.forEach((v,i) => {
+    const d = document.createElement('div');
+    d.className = 'drum-item' + (i===initIdx?' center':'');
+    d.textContent = String(v).padStart(2,'0');
+    list.appendChild(d);
+  });
+  for(let i=0;i<PAD;i++) { const d=document.createElement('div'); d.className='drum-item'; list.appendChild(d); }
+
+  wheels[key] = { list, drum: document.getElementById(drumId), items, index: initIdx, PAD };
+  _applyWheelPos(key, false);
+  _addDrumGestures(key);
+}
+
+function setWheelIdx(key, idx, animate) {
+  const w = wheels[key];
+  const n = w.items.length;
+  w.index = Math.max(0, Math.min(n-1, idx));
+  _applyWheelPos(key, animate);
+}
+
+function _applyWheelPos(key, animate) {
+  const w = wheels[key];
+  w.list.style.transition = animate ? 'transform .18s cubic-bezier(.25,.8,.25,1)' : 'none';
+  w.list.style.transform  = `translateY(${-w.index * ITEM_H}px)`;
+  w.list.querySelectorAll('.drum-item').forEach((el,i) => {
+    el.classList.toggle('center', i - w.PAD === w.index);
+  });
+}
+
+function _addDrumGestures(key) {
+  const w = wheels[key];
+  let startY=0, startIdx=0, lastY=0, vel=0, lastT=0;
+
+  w.drum.addEventListener('touchstart', e=>{
+    e.preventDefault();
+    startY=e.touches[0].clientY; lastY=startY; startIdx=w.index; vel=0; lastT=Date.now();
+    w.list.style.transition='none';
+  },{passive:false});
+
+  w.drum.addEventListener('touchmove', e=>{
+    e.preventDefault();
+    const y=e.touches[0].clientY, now=Date.now();
+    vel=(lastY-y)/(now-lastT+1); lastY=y; lastT=now;
+    const raw=startIdx+(startY-y)/ITEM_H;
+    const cl=Math.max(0,Math.min(w.items.length-1,raw));
+    w.list.style.transform=`translateY(${-cl*ITEM_H}px)`;
+    w.list.querySelectorAll('.drum-item').forEach((el,i)=>el.classList.toggle('center',i-w.PAD===Math.round(cl)));
+  },{passive:false});
+
+  w.drum.addEventListener('touchend', e=>{
+    const y=e.changedTouches[0].clientY;
+    let ni=Math.round(startIdx+(startY-y)/ITEM_H+vel*8);
+    setWheelIdx(key, ni, true); playClick();
+  });
+
+  // mouse (desktop)
+  let md=false,msy=0,msi=0;
+  w.drum.addEventListener('mousedown',e=>{md=true;msy=e.clientY;msi=w.index;});
+  window.addEventListener('mousemove',e=>{
+    if(!md)return;
+    const cl=Math.max(0,Math.min(w.items.length-1,msi+(msy-e.clientY)/ITEM_H));
+    w.list.style.transition='none';
+    w.list.style.transform=`translateY(${-cl*ITEM_H}px)`;
+    w.list.querySelectorAll('.drum-item').forEach((el,i)=>el.classList.toggle('center',i-w.PAD===Math.round(cl)));
+  });
+  window.addEventListener('mouseup',e=>{
+    if(!md)return; md=false;
+    setWheelIdx(key,Math.round(msi+(msy-e.clientY)/ITEM_H),true);
+  });
+}
+
+/* ══ CONFIRMAR TIEMPO → GRACIAS ══ */
+function confirmarTiempo() {
+  const h = wheels.h.index;
+  const m = wheels.m.index;
+  const hStr = String(h).padStart(2,'0');
+  const mStr = String(m).padStart(2,'0');
+  const resumen = `${currentTarea}  ·  ${hStr}h ${mStr}min`;
+
+  playGracias(); doFlash();
+  document.getElementById('gracias-nombre').textContent  = currentNombre;
+  document.getElementById('gracias-resumen').textContent = resumen;
+
+  let secs=4;
+  document.getElementById('gracias-timer').textContent=`VOLVIENDO EN ${secs}s…`;
+  showScreen('screen-gracias');
+  clearTimeout(graciasTid);
+  const tick=()=>{
+    secs--;
+    if(secs>0){ document.getElementById('gracias-timer').textContent=`VOLVIENDO EN ${secs}s…`; graciasTid=setTimeout(tick,1000); }
+    else startCamera();
+  };
+  graciasTid=setTimeout(tick,1000);
+  console.log(`[${new Date().toLocaleString()}] ${currentNombre} → ${resumen}`);
+}
+
+/* ══ INIT ══ */
+buildWheel('h','list-h','drum-h', Array.from({length:13},(_,i)=>i), 1);
+buildWheel('m','list-m','drum-m', Array.from({length:60},(_,i)=>i), 0);
+startCamera();
 </script>
 </body>
 </html>
